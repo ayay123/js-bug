@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .outer {
+            width: 510px;
+            height: 190px;
+            margin: 200px auto;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid red;
+            position: relative;
+        }
+
+        .inner {
+            width: 490px;
+            height: 170px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        ul {
+            width: 610%;
+            top: 0;
+            left: 0;
+            position: absolute;
+        }
+
+        ul li {
+            float: left;
+        }
+
+        ul li img {
+            vertical-align: middle;
+        }
+
+        ol {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        ol li {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            margin: 0 6px;
+            text-align: center;
+            line-height: 20px;
+            float: left;
+            cursor: pointer;
+        }
+
+        .current {
+            background-color: orange;
+            color: #fff;
+        }
+
+        .select {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            left: 0;
+            top: 60px;
+            display: none;
+        }
+
+        span {
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            font-size: 30px;
+            background-color: red;
+            display: block;
+            cursor: pointer;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .right {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<div class="outer">
+    <div class="inner">
+        <ul>
+            <li><img src="images/01.jpg" alt=""/></li>
+            <li><img src="images/02.jpg" alt=""/></li>
+            <li><img src="images/03.jpg" alt=""/></li>
+            <li><img src="images/04.jpg" alt=""/></li>
+            <li><img src="images/05.jpg" alt=""/></li>
+        </ul>
+        <div class="select">
+            <span class="left"><</span>
+            <span class="right">></span>
+        </div>
+    </div>
+    <ol>
+
+    </ol>
+
+</div>
+<script>
+    //获取元素
+    var outer = document.getElementsByTagName('div')[0];
+    var inner = outer.firstElementChild || outer.firstChild;
+    var select = inner.children[1];
+    var right = select.children[1];
+    var left = right.previousElementSibling || right.previousSibling;
+    var ol = outer.children[1];
+    var ul = inner.getElementsByTagName('ul')[0];
+    var ulLiArr = ul.children;
+    var imgWidth = inner.offsetWidth;
+
+    inner.onmouseover = function () {
+        select.style.display = 'block';
+
+    }
+    inner.onmouseout = function () {
+        select.style.display = 'none';
+    }
+    outer.onmouseover = function () {
+        clearInterval(timer);
+    }
+    outer.onmouseout = function () {
+        timer = setInterval(aaa, 1000);
+    }
+    for (var i = 0; i < ulLiArr.length; i++) {
+        var newLi = document.createElement('li');
+        newLi.innerHTML = i + 1;
+        ol.appendChild(newLi);
+    }
+    ul.appendChild(ulLiArr[0].cloneNode(true));
+    var olLiArr = ol.children;
+
+
+    var index = 0;
+    var square = 0;
+
+    olLiArr[square].style.backgroundColor = 'orange';
+    right.onclick = function () {
+        square++;
+        for (var j = 0; j < olLiArr.length; j++) {
+            olLiArr[j].style.backgroundColor = 'white';
+        }
+        olLiArr[square].style.backgroundColor = 'orange';
+        if (square == 4) {
+            square = -1;
+        }
+        index++;
+        if (index == 6) {
+            ul.style.left = 0;
+            index = 1;
+        }
+        var sss = index * imgWidth;
+        animate(ul, -sss);
+    }
+    left.onclick = function () {
+        index--;
+        square--;
+        for (var j = 0; j < olLiArr.length; j++) {
+            olLiArr[j].style.backgroundColor = 'white';
+        }
+        olLiArr[square].style.backgroundColor = 'orange';
+        if (square == 0) {
+            square = 5;
+        }
+        if (index < 0) {
+
+            ul.style.left = -imgWidth * (ul.children.length - 1) + 'px';
+            index = 4;
+        }
+        var sss = index * imgWidth;
+        animate(ul, -sss);
+
+    }
+    for (var i = 0; i < olLiArr.length; i++) {
+        olLiArr[i].index = i;
+        olLiArr[i].onmouseover = function () {
+            for (var j = 0; j < olLiArr.length; j++) {
+                olLiArr[j].style.backgroundColor = 'white';
+            }
+            this.style.backgroundColor = 'orange';
+            var sss = imgWidth * this.index;
+            animate(ul, -sss);
+            square = this.index;
+            index = this.index;
+        }
+    }
+    var timer = setInterval(aaa, 1000);
+
+
+
+
+    function aaa() {
+        square++;
+        index++;
+        for (var j = 0; j < olLiArr.length; j++) {
+            olLiArr[j].style.backgroundColor = 'white';
+        }
+        olLiArr[square].style.backgroundColor = 'orange';
+        if (square == 4) {
+            square = -1;
+        }
+        if (index == 5) {
+            ul.style.left = 0;
+            index = 0;
+        }
+        var sss = imgWidth * index;
+        animate(ul, -sss);
+    }
+
+
+
+
+
+
+
+
+
+    function animate(ele, target) {
+        clearInterval(ele.timer);
+        ele.timer = setInterval(function () {
+            var step = target > ele.offsetLeft ? 10 : -10;
+            ele.style.left = ele.offsetLeft + step + 'px';
+            if (Math.abs(ele.offsetLeft - target) <= Math.abs(step)) {
+                ele.style.left = target + 'px';
+                clearInterval(ele.timer);
+            }
+        }, 10);
+    }
+</script>
+</body>
+</html>
